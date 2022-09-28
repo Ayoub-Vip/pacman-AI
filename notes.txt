@@ -1,0 +1,34 @@
+API
+You must implement your agent as a PacmanAgent class, following the template of pacmanagent.py. The core of your algorithm should be implemented or called within the get_action method. This method receives the current state s of the game and should return the action to take.
+
+Useful methods of the state are specified below:
+
+s.generatePacmanSuccessors(): Returns a list of pairs of successor states and moves given the current state s for the pacman agent.
+This method must be called for any node expansion for pacman agent.
+
+s.generateGhostSuccessors(agentIndex): Returns a list of pairs of successor states and moves given the current state s for the ghost agent indexed by agentIndex>0.
+
+This method must be called for any node expansion for ghost agent.
+s.getLegalActions(agentIndex): Returns a list of legal moves given the state s and the agent indexed by agentIndex. 0 is always the Pacman agent.
+
+s.getPacmanPosition(): Returns the Pacman position in a (x,y) pair.
+
+s.getScore(): Returns the total score of a state (as defined above).
+
+s.getFood(): Returns a boolean matrix which gives the position of all food dots.
+
+s.getNumFood(): Returns a scalar which gives the number of food dots remaining.
+
+s.getWalls(): Returns a boolean matrix which gives the position of all walls.
+
+s.getGhostPosition(agentIndex): Returns the position of the ghost agent indexed by agentIndex>0.
+
+s.getGhostDirection(agentIndex): Returns the direction of the ghost agent indexed by agentIndex>0.
+
+s.getCapsules(): Returns a list of positions of the remaining capsules in the maze.
+
+s.isWin(): Returns True if the state is in a winning end.
+
+s.isLose(): Returns True if the state is in a losing end.
+
+Implementation examples are provided in humanagent.py and randomagent.py.
