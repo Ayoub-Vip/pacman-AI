@@ -14,7 +14,15 @@ def key(state):
 
     return (
         state.getPacmanPosition(),
-        # ...
+        state.getFood(),
+        # state.getScore(),
+        # state.getNumFood(),
+        # state.getNumAgents()
+
+
+
+        # cap for cap in state.getCapsules()
+        
     )
 
 

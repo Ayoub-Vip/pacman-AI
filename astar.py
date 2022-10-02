@@ -1,5 +1,5 @@
 from pacman_module.game import Agent, Directions
-from pacman_module.util import Stack
+from pacman_module.util import Stack, PriorityQueue
 
 
 def key(state):
@@ -14,6 +14,7 @@ def key(state):
 
     return (
         state.getPacmanPosition(),
+        state.getFood()
         # ...
     )
 
@@ -37,14 +38,14 @@ class PacmanAgent(Agent):
         """
 
         if self.moves is None:
-            self.moves = self.dfs(state)
+            self.moves = self.astar(state)
 
         if self.moves:
             return self.moves.pop(0)
         else:
             return Directions.STOP
 
-    def dfs(self, state):
+    def astar(self, state):
         """Given a Pacman game state, returns a list of legal moves to solve
         the search layout.
 
@@ -56,15 +57,16 @@ class PacmanAgent(Agent):
         """
 
         path = []
-        fringe = Stack()
-        fringe.push((state, path))
+        fringe = PriorityQueue()
+        fringe.push((state, path), 0)
         closed = set()
 
         while True:
             if fringe.isEmpty():
                 return []
 
-            current, path = fringe.pop()
+            priority, (current, path) = fringe.pop()
+            #print(priority, path)
 
             if current.isWin():
                 return path
@@ -77,6 +79,6 @@ class PacmanAgent(Agent):
                 closed.add(current_key)
 
             for successor, action in current.generatePacmanSuccessors():
-                fringe.push((successor, path + [action]))
+                fringe.push((successor, path + [action]), len(path) + successor.getNumFood())
 
         return path
