@@ -15,8 +15,9 @@ def key(state):
     return (
         state.getPacmanPosition(),
         state.getFood()
-        # ...
-    )
+
+    ) + tuple(state.getCapsules()) 
+    + tuple([(x,y) for x in state.getFood()[0] for y in state.getFood()[1] if state.getFood()[x][y]])
 
 
 class PacmanAgent(Agent):
