@@ -15,7 +15,7 @@ def key(state):
     return (
         state.getPacmanPosition(),
         state.getFood()
-        
+
     ) + tuple(state.getCapsules()) 
     + tuple([(x,y) for x in state.getFood()[0] for y in state.getFood()[1] if state.getFood()[x][y]])
 
@@ -58,26 +58,30 @@ class PacmanAgent(Agent):
             A list of legal moves.
         """
 
-        def heuristic_function(state):
-            """ give a state instance, returns the heuristic function based on 
-            remaining number of food in addition to the average distances between sequence 
-            of food  
-            Arguments: 
+        def f_function(state):
+            def heuristic_function(state):
+                """ give a state instance, returns the heuristic function based on 
+                remaining number of food in addition to the average distances between sequence 
+                of food
+                
+                Arguments: 
                 state: a game state
 
-            Returns: 
-                heuritic function
-            """
-            return state.getNumFood()
+                Returns: 
+                    heuritic function
+                """
+                return state.getNumFood()
 
-        def g_function(state):
-            # return 1.00/state.getScore()
-            return 1.00/state.getScore() if state.getScore() != 0 else 0
+            def g_function(state):
+                return 1.00/state.getScore() if state.getScore() != 0 else 0
+
+
+            return g_function(state) + heuristic_function(state)
 
 
         path = []
         fringe = PriorityQueue()
-        fringe.push((state, path), heuristic_function(state))
+        fringe.push((state, path), f_function(state))
         closed = set()
 
         while True:
@@ -98,6 +102,6 @@ class PacmanAgent(Agent):
                 closed.add(current_key)
 
             for successor, action in current.generatePacmanSuccessors():
-                fringe.push((successor, path + [action]), g_function(successor) + heuristic_function(successor))
+                fringe.push((successor, path + [action]), f_function(successor))
 
         return path
