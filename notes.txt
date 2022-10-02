@@ -1,3 +1,37 @@
+        def heuristic_function(state):
+            """ give a state instance, returns the heuristic function based on 
+            remaining number of food in addition to the average distances between sequence 
+            of food  
+            Arguments: 
+                state: a game state
+
+            Returns: 
+                heuritic function
+            """
+            averageSum = 0.00
+            
+
+
+            return float(state.getNumFood()) + averageSum 
+
+        def g_function(state):
+            # return 1.00/state.getScore()
+            return 1.00/state.getScore() if state.getScore() != 0 else 0
+
+    return (
+        state.getPacmanPosition(),
+        # state.getFood()
+        # ...
+    ) + tuple(state.getCapsules()) 
+    + tuple([(x,y) for x in state.getFood()[0] for y in state.getFood()[1] if state.getFood()[x][y]])
+
+
+
+
+
+
+
+
 API
 You must implement your agent as a PacmanAgent class, following the template of pacmanagent.py. The core of your algorithm should be implemented or called within the get_action method. This method receives the current state s of the game and should return the action to take.
 
