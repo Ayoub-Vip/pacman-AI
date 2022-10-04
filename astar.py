@@ -1,5 +1,5 @@
 from pacman_module.game import Agent, Directions
-from pacman_module.util import Stack, PriorityQueue
+from pacman_module.util import  manhattanDistance, PriorityQueue
 
 
 def key(state):
@@ -70,13 +70,25 @@ class PacmanAgent(Agent):
                 Returns: 
                     heuritic function
                 """
-                return state.getNumFood()
+                foodlist = state.getFood().asList()
+                position = state.getPacmanPosition()
+                distance = [0 for i in range(len(foodlist))]
+                minLoc = 0 
+                for i in range(len(foodlist)):
+                      for i in range(len(foodlist)):
+                          minLoc =min(minLoc, manhattanDistance(position, foodlist[i]))
+                          if distance:
+                              return minLoc
+
+            
+                return minLoc
+             
 
             def g_function(state):
-                return 1.00/state.getScore() if state.getScore() != 0 else 0
+                return state.getNumFood()
 
 
-            return g_function(state) + heuristic_function(state)
+            return  g_function(state)+heuristic_function(state)
 
 
         path = []
