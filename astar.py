@@ -1,7 +1,6 @@
 from pacman_module.game import Agent, Directions
 from pacman_module.util import PriorityQueue , manhattanDistance
 
-
 def key(state):
     """Returns a key that uniquely identifies a Pacman game state.
 
@@ -26,28 +25,6 @@ class PacmanAgent(Agent):
 
         self.moves = None
 
-    def heuristic(self, state):
-        """
-        Given a state, returns the Manhattan distance of the nearest food.
-
-        Arguments:
-        ----------
-        - `state`: the current game state. See FAQ and class
-                   `pacman.GameState`.
-
-        Return:
-        -------
-        - the Manhattan distance of the farthest food.
-        """
-        foodlist = state.getFood().asList()
-        position = state.getPacmanPosition()
-        distance = [0 for i in range(len(foodlist))]
-        for i in range(len(foodlist)):
-            distance[i] = manhattanDistance(position, foodlist[i])
-        if distance:
-            return min(distance)
-        else:
-            return 0
     def get_action(self, state):
         """Given a Pacman game state, returns a legal move.
 
@@ -59,14 +36,14 @@ class PacmanAgent(Agent):
         """
 
         if self.moves is None:
-            self.moves = self.astra(state)
+            self.moves = self.astar(state)
 
         if self.moves:
             return self.moves.pop(0)
         else:
             return Directions.STOP
 
-    def astra(self, state):
+    def astar(self, state):
         """Given a Pacman game state, returns a list of legal moves to solve
         the search layout.
 
@@ -77,10 +54,43 @@ class PacmanAgent(Agent):
             A list of legal moves.
         """
 
+        def f_function(state):
+            def heuristic_function(state):
+                """ give a state instance, returns the heuristic function based on 
+                remaining number of food in addition to the average distances between sequence 
+                of food
+                
+                Arguments: 
+                state: a game state
+
+                Returns: 
+                    heuritic function
+                """
+                foodlist = state.getFood().asList()
+                position = state.getPacmanPosition()
+                minLoc=0
+                for i in range(len(foodlist)):
+                    man =manhattanDistance(position, foodlist[i])
+                    if i==0:
+                         minLoc=man
+                    if man < minLoc:
+                         minLoc = man
+            
+                return minLoc
+             
+
+            def g_function(state):
+          
+                return state.getNumFood()
+
+
+            return g_function(state)-heuristic_function(state)
+
+
         path = []
         fringe = PriorityQueue()
-        z = self.heuristic(state)
-        fringe.push((state, path, 0), z)  # push starting state to fringe
+        cost =0
+        fringe.push((state, path,cost), f_function(state))
         closed = set()
 
         while True:
@@ -106,11 +116,9 @@ class PacmanAgent(Agent):
                 
                 newcost = cost
                 foodPresence = successor.getFood()
-                if foodPresence is True:
+                if foodPresence is False:
                     newcost = newcost + 1
-                else:
-                    newcost = newcost + 2
+         
                 fringe.push((successor, newpath, newcost),
-                                    newcost
-                                    + 50 * self.heuristic(successor))
+                                    newcost +f_function(successor))
         return path
