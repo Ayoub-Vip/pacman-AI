@@ -54,8 +54,8 @@ class PacmanAgent(Agent):
             A list of legal moves.
         """
 
-        def f_function(state):
-            def heuristic_function(state):
+        def heuristic_function(state):
+  
                 """ give a state instance, returns the heuristic function based on 
                 remaining number of food in addition to the average distances between sequence 
                 of food
@@ -76,21 +76,14 @@ class PacmanAgent(Agent):
                     if man < minLoc:
                          minLoc = man
             
-                return minLoc
-             
+                return  minLoc+10*state.getNumFood()
 
-            def g_function(state):
-          
-                return state.getNumFood()
-
-
-            return g_function(state)-heuristic_function(state)
 
 
         path = []
         fringe = PriorityQueue()
         cost =0
-        fringe.push((state, path,cost), f_function(state))
+        fringe.push((state, path,cost), heuristic_function(state))
         closed = set()
 
         while True:
@@ -115,10 +108,11 @@ class PacmanAgent(Agent):
                 newpath =path + [action]
                 
                 newcost = cost
+                pos=successor.getPacmanPosition()
                 foodPresence = successor.getFood()
-                if foodPresence is False:
-                    newcost = newcost + 1
-         
+                if foodPresence[pos[0]] [pos[1]] is False:
+                    newcost = newcost -1
+
                 fringe.push((successor, newpath, newcost),
-                                    newcost +f_function(successor))
+                                    newcost +heuristic_function(successor))
         return path
