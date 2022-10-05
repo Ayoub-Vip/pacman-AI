@@ -16,8 +16,8 @@ def key(state):
         state.getPacmanPosition(),
         state.getFood()
 
-    )+tuple(state.getFood().asList())
-    #+ tuple(state.getCapsules()) 
+    )#+ tuple(state.getCapsules())+ tuple(state.getGhostStates())
+    #+tuple(state.getFood().asList()) + tuple(state.getCapsules()) 
     #+ tuple([(x,y) for x in state.getFood()[0] for y in state.getFood()[1] if state.getFood()[x][y]])
 
 
@@ -59,7 +59,7 @@ class PacmanAgent(Agent):
             A list of legal moves.
         """
 
-        def f_function(state):
+        def f_function(state, steps):
             def heuristic_function(state):
                 """ give a state instance, returns the heuristic function based on 
                 remaining number of food in addition to the average distances between sequence 
@@ -74,17 +74,19 @@ class PacmanAgent(Agent):
                 foodlist = state.getFood().asList()
                 position = state.getPacmanPosition()
                 minLoc=0
+                sumLoc=0
                 for i in range(len(foodlist)):
                     man =manhattanDistance(position, foodlist[i])
                     if i==0:
                          minLoc=man
                     if man < minLoc:
                          minLoc = man
+                    sumLoc += manhattanDistance(foodlist[i], foodlist[i+1] if i < len(foodlist)-1 else foodlist[i])
             
-                return minLoc+10*state.getNumFood()
+                return minLoc#+sumLoc -len(state.getCapsules())#state.getNumFood()+
 
             def g_function(state):
-                return -state.getScore()
+                return steps-state.getScore()
 
 
             return  g_function(state)+heuristic_function(state)
@@ -92,7 +94,7 @@ class PacmanAgent(Agent):
 
         path = []
         fringe = PriorityQueue()
-        fringe.push((state, path), f_function(state))
+        fringe.push((state, path), f_function(state, 0))
         closed = set()
 
         while True:
@@ -113,6 +115,6 @@ class PacmanAgent(Agent):
                 closed.add(current_key)
 
             for successor, action in current.generatePacmanSuccessors():
-                fringe.push((successor, path + [action]), f_function(successor))
+                fringe.push((successor, path + [action]), f_function(successor, len(path)))
 
         return path
