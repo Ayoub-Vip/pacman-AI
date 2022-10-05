@@ -16,8 +16,9 @@ def key(state):
         state.getPacmanPosition(),
         state.getFood()
 
-    ) + tuple(state.getCapsules()) 
-    + tuple([(x,y) for x in state.getFood()[0] for y in state.getFood()[1] if state.getFood()[x][y]])
+    )+tuple(state.getFood().asList())
+    #+ tuple(state.getCapsules()) 
+    #+ tuple([(x,y) for x in state.getFood()[0] for y in state.getFood()[1] if state.getFood()[x][y]])
 
 
 
@@ -72,20 +73,18 @@ class PacmanAgent(Agent):
                 """
                 foodlist = state.getFood().asList()
                 position = state.getPacmanPosition()
-                distance = [0 for i in range(len(foodlist))]
-                minLoc = 0 
+                minLoc=0
                 for i in range(len(foodlist)):
-                      for i in range(len(foodlist)):
-                          minLoc =min(minLoc, manhattanDistance(position, foodlist[i]))
-                          if distance:
-                              return minLoc
-
+                    man =manhattanDistance(position, foodlist[i])
+                    if i==0:
+                         minLoc=man
+                    if man < minLoc:
+                         minLoc = man
             
-                return minLoc
-             
+                return minLoc+10*state.getNumFood()
 
             def g_function(state):
-                return state.getNumFood()
+                return -state.getScore()
 
 
             return  g_function(state)+heuristic_function(state)
