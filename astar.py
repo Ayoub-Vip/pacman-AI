@@ -16,8 +16,8 @@ def key(state):
         state.getPacmanPosition(),
         state.getFood()
 
-    )#+ tuple(state.getCapsules())+ tuple(state.getGhostStates())
-    #+tuple(state.getFood().asList()) + tuple(state.getCapsules()) 
+    )+tuple(state.getCapsules())+ tuple(state.getGhostStates())
+
     #+ tuple([(x,y) for x in state.getFood()[0] for y in state.getFood()[1] if state.getFood()[x][y]])
 
 
@@ -88,21 +88,22 @@ class PacmanAgent(Agent):
             def g_function(state):
                 return steps-state.getScore()
 
-
             return  g_function(state)+heuristic_function(state)
 
 
         path = []
         fringe = PriorityQueue()
-        fringe.push((state, path), f_function(state, 0))
+        cost =0
+        fringe.push((state, path,cost), f_function(state,0))
         closed = set()
 
         while True:
             if fringe.isEmpty():
                 return []
-
-            priority, (current, path) = fringe.pop()
-            #print(priority, path)
+            (priority, item) = fringe.pop()
+            current = item[0]
+            path = item[1]
+            cost = item[2]
 
             if current.isWin():
                 return path
@@ -115,6 +116,16 @@ class PacmanAgent(Agent):
                 closed.add(current_key)
 
             for successor, action in current.generatePacmanSuccessors():
-                fringe.push((successor, path + [action]), f_function(successor, len(path)))
+                newpath =path + [action]
+                
+                newcost = cost
+                pos=successor.getPacmanPosition()
+                food = state.getFood()
+                if food [pos[0]][pos[1]] is False:
+                    print("False")
+                    newcost+=1
+           
 
+                fringe.push((successor, newpath,newcost),
+                                    newcost+f_function(successor,len(path)))
         return path
