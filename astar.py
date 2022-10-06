@@ -16,7 +16,7 @@ def key(state):
         state.getPacmanPosition(),
         state.getFood()
 
-    )+tuple(state.getCapsules())+ tuple(state.getGhostStates())
+    )#+tuple(state.getCapsules())+ tuple(state.getGhostStates())
 
     #+ tuple([(x,y) for x in state.getFood()[0] for y in state.getFood()[1] if state.getFood()[x][y]])
 
@@ -59,42 +59,69 @@ class PacmanAgent(Agent):
             A list of legal moves.
         """
 
-        def f_function(state, steps):
-            def heuristic_function(state):
-                """ give a state instance, returns the heuristic function based on 
-                remaining number of food in addition to the average distances between sequence 
-                of food
+        def heuristic_function(state, steps):
+            """ give a state instance, returns the heuristic function based on 
+            remaining number of food in addition to the average distances between sequence 
+            of food
+            
+            Arguments: 
+            state: a game state
+
+            Returns: 
+                heuritic function
+            """
+            foodlist = state.getFood().asList()
+            position = state.getPacmanPosition()
+            minLoc=0
+            closest=[]
+            farest=[]
+            for i in range(len(foodlist)):
+                man =manhattanDistance(position, foodlist[i])
+                if i==0:
+                        minLoc=man
+                        farest = foodlist[i]
+                        closest = foodlist[i]
+
+                if man < minLoc:
+                        minLoc = man
+                        closest = foodlist[i]
+                if man > minLoc:
+                        farest = foodlist[i]
+                # sumLoc += manhattanDistance(foodlist[i], foodlist[i+1] if i < len(foodlist)-1 else foodlist[i])
+            far =0
+            if len(closest)>0:
+                far=manhattanDistance(closest, farest)
+            return steps-state.getScore()+minLoc+far#+sumLoc -len(state.getCapsules())#state.getNumFood()+
+
+        def stepCost(state , successor,cost):
+            """ calculate new cost taking into consideration old state cost
                 
                 Arguments: 
-                state: a game state
+                state: old state
+                successor: new state
+                cost: old cost
 
                 Returns: 
-                    heuritic function
-                """
-                foodlist = state.getFood().asList()
-                position = state.getPacmanPosition()
-                minLoc=0
-                sumLoc=0
-                for i in range(len(foodlist)):
-                    man =manhattanDistance(position, foodlist[i])
-                    if i==0:
-                         minLoc=man
-                    if man < minLoc:
-                         minLoc = man
-                    sumLoc += manhattanDistance(foodlist[i], foodlist[i+1] if i < len(foodlist)-1 else foodlist[i])
-            
-                return minLoc#+sumLoc -len(state.getCapsules())#state.getNumFood()+
+                    new cost
+            """
+            successorPos=successor.getPacmanPosition()
+            food = state.getFood()
+            capsulees = state.getCapsules()
+            # if food [successorPos[0]][successorPos[1]] is False:
+            #     cost+=1
+            # if capsulees[0]==successorPos[0] and capsulees[1]==successorPos[1]:
+            #     print("capsule")
+            #     cost+=1
+            # if state.getNumFood()==successor.getNumFood():
+            #     cost+=2
 
-            def g_function(state):
-                return steps-state.getScore()
 
-            return  g_function(state)+heuristic_function(state)
-
+            return cost
 
         path = []
         fringe = PriorityQueue()
         cost =0
-        fringe.push((state, path,cost), f_function(state,0))
+        fringe.push((state, path,cost), heuristic_function(state,0))
         closed = set()
 
         while True:
@@ -117,15 +144,10 @@ class PacmanAgent(Agent):
 
             for successor, action in current.generatePacmanSuccessors():
                 newpath =path + [action]
-                
-                newcost = cost
-                pos=successor.getPacmanPosition()
-                food = state.getFood()
-                if food [pos[0]][pos[1]] is False:
-                    print("False")
-                    newcost+=1
-           
+                newcost = stepCost(state , successor,cost)
 
                 fringe.push((successor, newpath,newcost),
-                                    newcost+f_function(successor,len(path)))
+                                    newcost+heuristic_function(successor,len(path)))
         return path
+
+   
