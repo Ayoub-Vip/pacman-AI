@@ -12,7 +12,7 @@ def key(state):
     """
 
     return (
-        state.getPacmanPosition(),
+        state.getPacmanPosition(), 
         state.getFood()
     )+tuple(state.getCapsules())+ tuple(state.getGhostStates())
 
@@ -55,15 +55,14 @@ class PacmanAgent(Agent):
         """
 
         def heuristic_function(state):
-            """ give a state instance, returns the heuristic function based on 
-            remaining number of food in addition to the average distances between sequence 
-            of food
+            """ given a state instance, returns the heuristic function based on 
+            the nearest food, farthest food and the average distance  of the remaining food.            of food
             
             Arguments: 
             state: a game state
 
             Returns: 
-                heuritic function
+                heuristic value
             """
             foodlist = state.getFood().asList()
             position = state.getPacmanPosition()
@@ -89,7 +88,7 @@ class PacmanAgent(Agent):
                 if len(closest)>0:
                     far=manhattanDistance(closest, farest)
         
-            return minLoc+far
+            return minLoc+far+state.getNumFood()
 
         def calculateNewCost(state , successor,cost):
             """ calculate new cost taking into consideration old state cost

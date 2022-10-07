@@ -3,6 +3,15 @@ from pacman_module.util import Queue
 
 
 def key(state):
+    """Returns a key that uniquely identifies a Pacman game state.
+
+    Arguments:
+        state: a game state. See API or class `pacman.GameState`.
+
+    Returns:
+        A hashable key tuple.
+    """
+
     return (
         state.getPacmanPosition(),
         state.getFood()
