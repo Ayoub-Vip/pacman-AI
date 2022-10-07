@@ -105,7 +105,7 @@ class PacmanAgent(Agent):
         path = []
         fringe = PriorityQueue()
         cost =0
-        fringe.push((state, path,cost), heuristic_function(state,0))
+        fringe.push((state, path,cost), heuristic_function(state))
         closed = set()
 
         while True:
