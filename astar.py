@@ -55,28 +55,57 @@ class PacmanAgent(Agent):
         """
 
         def heuristic_function(state):
-  
-                """ give a state instance, returns the heuristic function based on 
-                remaining number of food in addition to the average distances between sequence 
-                of food
+            """ give a state instance, returns the heuristic function based on 
+            remaining number of food in addition to the average distances between sequence 
+            of food
+            
+            Arguments: 
+            state: a game state
+
+            Returns: 
+                heuritic function
+            """
+            foodlist = state.getFood().asList()
+            position = state.getPacmanPosition()
+            minLoc=0
+            maxLoc=0
+            closest=[]
+            farest=[]
+            far =0
+            for i in range(len(foodlist)):
+                man =manhattanDistance(position, foodlist[i])
+                if i==0:
+                        minLoc=man
+                        farest = foodlist[i]
+                        closest = foodlist[i]
+
+                if man < minLoc:
+                        minLoc = man
+                        closest = foodlist[i]
+                if man > maxLoc:
+                        maxLoc=man
+                        farest = foodlist[i]
+                
+                if len(closest)>0:
+                    far=manhattanDistance(closest, farest)
+        
+            return minLoc+far
+
+        def calculateNewCost(state , successor,cost):
+            """ calculate new cost taking into consideration old state cost
                 
                 Arguments: 
-                state: a game state
-
+                state: old state
+                successor: new state
+                cost: old cost
                 Returns: 
-                    heuritic function
-                """
-                foodlist = state.getFood().asList()
-                position = state.getPacmanPosition()
-                minLoc=0
-                for i in range(len(foodlist)):
-                    man =manhattanDistance(position, foodlist[i])
-                    if i==0:
-                         minLoc=man
-                    if man < minLoc:
-                         minLoc = man
-            
-                return  minLoc+10*state.getNumFood()
+                    new cost
+            """
+            cost+=1 #number steps
+            if len(state.getCapsules())>len(successor.getCapsules()):
+                 cost+=5
+
+            return cost
 
 
 
@@ -89,11 +118,8 @@ class PacmanAgent(Agent):
         while True:
             if fringe.isEmpty():
                 return []
-            (priority, item) = fringe.pop()
-            current = item[0]
-            path = item[1]
-            cost = item[2]
-
+            (priority, (current,path,cost)) = fringe.pop()
+  
             if current.isWin():
                 return path
 
@@ -107,11 +133,7 @@ class PacmanAgent(Agent):
             for successor, action in current.generatePacmanSuccessors():
                 newpath =path + [action]
                 
-                newcost = cost
-                pos=successor.getPacmanPosition()
-                foodPresence = successor.getFood()
-                if foodPresence[pos[0]] [pos[1]] is False:
-                    newcost = newcost -1
+                newcost = calculateNewCost(state,successor,cost)
 
                 fringe.push((successor, newpath, newcost),
                                     newcost +heuristic_function(successor))
