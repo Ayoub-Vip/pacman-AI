@@ -19,7 +19,7 @@ def key(state):
 
 
 class PacmanAgent(Agent):
-    """Pacman agent based on depth-first search (DFS)."""
+    """Pacman agent based on Breadth-first search (DFS)."""
 
     def __init__(self):
         super().__init__()

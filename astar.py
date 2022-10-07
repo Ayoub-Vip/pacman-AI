@@ -1,5 +1,6 @@
 from pacman_module.game import Agent, Directions
-from pacman_module.util import PriorityQueue , manhattanDistance
+from pacman_module.util import PriorityQueue, manhattanDistance
+
 
 def key(state):
     """Returns a key that uniquely identifies a Pacman game state.
@@ -12,13 +13,13 @@ def key(state):
     """
 
     return (
-        state.getPacmanPosition(), 
+        state.getPacmanPosition(),
         state.getFood()
-    )+tuple(state.getCapsules())+ tuple(state.getGhostStates())
+    ) + tuple(state.getCapsules()) + tuple(state.getGhostStates())
 
 
 class PacmanAgent(Agent):
-    """Pacman agent based on depth-first search (DFS)."""
+    """Pacman agent based on A* search (DFS)."""
 
     def __init__(self):
         super().__init__()
@@ -42,6 +43,7 @@ class PacmanAgent(Agent):
             return self.moves.pop(0)
         else:
             return Directions.STOP
+        return Directions.STOP
 
     def astar(self, state):
         """Given a Pacman game state, returns a list of legal moves to solve
@@ -55,70 +57,69 @@ class PacmanAgent(Agent):
         """
 
         def heuristic_function(state):
-            """ given a state instance, returns the heuristic function based on 
-            the nearest food, farthest food and the average distance  of the remaining food.            of food
-            
-            Arguments: 
+            """ given a state instance, returns the heuristic function based on
+            the nearest food, farthest food and the average distance of the
+            remaining food.
+
+            Arguments:
             state: a game state
 
-            Returns: 
-                heuristic value
+            Returns:
+            heuristic value
             """
             foodlist = state.getFood().asList()
             position = state.getPacmanPosition()
-            minLoc=0
-            maxLoc=0
-            closest=[]
-            farest=[]
-            far =0
+            minLoc = 0
+            maxLoc = 0
+            closest = []
+            farest = []
+            far = 0
             for i in range(len(foodlist)):
-                man =manhattanDistance(position, foodlist[i])
-                if i==0:
-                        minLoc=man
-                        farest = foodlist[i]
-                        closest = foodlist[i]
+                man = manhattanDistance(position, foodlist[i])
+                if i == 0:
+                    minLoc = man
+                    farest = foodlist[i]
+                    closest = foodlist[i]
 
                 if man < minLoc:
-                        minLoc = man
-                        closest = foodlist[i]
+                    minLoc = man
+                    closest = foodlist[i]
                 if man > maxLoc:
-                        maxLoc=man
-                        farest = foodlist[i]
-                
-                if len(closest)>0:
-                    far=manhattanDistance(closest, farest)
-        
-            return minLoc+far+state.getNumFood()
+                    maxLoc = man
+                    farest = foodlist[i]
+                if len(closest) > 0:
+                    far = manhattanDistance(closest, farest)
 
-        def calculateNewCost(state , successor,cost):
+            return minLoc + far + state.getNumFood()
+
+        def calculateNewCost(state, successor, cost):
             """ calculate new cost taking into consideration old state cost
-                
-                Arguments: 
+
+                Arguments:
                 state: old state
                 successor: new state
                 cost: old cost
-                Returns: 
-                    new cost
+
+                Returns:
+                new cost
             """
-            cost+=1 #number steps
-            if len(state.getCapsules())>len(successor.getCapsules()):
-                 cost+=5
+            cost += 1  # number steps
+            if len(state.getCapsules()) > len(successor.getCapsules()):
+                cost += 5  # additional costs if passed by capsule
 
             return cost
 
-
-
         path = []
         fringe = PriorityQueue()
-        cost =0
-        fringe.push((state, path,cost), heuristic_function(state))
+        cost = 0
+        fringe.push((state, path, cost), heuristic_function(state))
         closed = set()
 
         while True:
             if fringe.isEmpty():
                 return []
-            (priority, (current,path,cost)) = fringe.pop()
-  
+            (priority, (current, path, cost)) = fringe.pop()
+
             if current.isWin():
                 return path
 
@@ -130,10 +131,10 @@ class PacmanAgent(Agent):
                 closed.add(current_key)
 
             for successor, action in current.generatePacmanSuccessors():
-                newpath =path + [action]
-                
-                newcost = calculateNewCost(state,successor,cost)
+                newpath = path + [action]
+
+                newcost = calculateNewCost(state, successor, cost)
 
                 fringe.push((successor, newpath, newcost),
-                                    newcost +heuristic_function(successor))
+                            newcost + heuristic_function(successor))
         return path
